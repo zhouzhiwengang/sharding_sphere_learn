@@ -1,0 +1,56 @@
+############################水平分库、分表#################################
+#服务端口
+server:
+  port: 8098
+#服务名
+spring:
+  http:
+    encoding:
+      enabled: true
+      charset: utf-8
+      force: true
+  main:
+    allow-bean-definition-overriding: true
+  #shardingsphere相关配置
+  shardingsphere:
+    datasource:
+      names: m1,m2   #配置库的名字，随意
+      m1:   #配置目前m1库的数据源信息
+        type: com.alibaba.druid.pool.DruidDataSource
+        driverClassName: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://192.168.60.165:3306/user_db?serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true&allowMultiQueries=true
+        username: admini
+        password: 123456
+      m2:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driverClassName: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://192.168.60.206:3306/user_db?serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true&allowMultiQueries=true
+        username: admini
+        password: 123456
+    sharding:
+      tables:
+        t_order:
+          key-generator:
+            column: user_id
+            type: SNOWFLAKE
+          actual-data-nodes: m$->{1..2}.t_order_$->{1..2}   # 分库策略，以user_id为分片键，分片策略为user_id % 2 + 1，user_id为偶数操作m1数据源，否则操作m2。
+          database‐strategy:  #分库策略
+            inline:
+              sharding‐column: user_id
+              algorithm‐expression: m$->{user_id % 2 + 1}
+          table‐strategy: #分表策略
+            inline:
+              sharding‐column: order_id
+              algorithm‐expression: t_order_$->{order_id % 2 + 1}
+    props:
+      sql:
+        show: true   #打印sql
+ 
+ 
+#日志打印
+logging:
+  level:
+    root: info
+    org.springframework.web: info
+    com.lucifer.sharding.dao: debug
+    druid.sql: debug

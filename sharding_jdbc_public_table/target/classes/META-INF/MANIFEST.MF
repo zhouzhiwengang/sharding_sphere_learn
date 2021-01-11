@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Implementation-Title: sharding_jdbc_public_table
+Implementation-Version: 0.0.1-SNAPSHOT
+Built-By: zzg
+Implementation-Vendor-Id: com.zzg
+Build-Jdk: 1.8.0_20
+Implementation-URL: https://projects.spring.io/spring-boot/#/spring-bo
+ ot-starter-parent/sharding_sphere_learn/sharding_jdbc_public_table
+Created-By: Maven Integration for Eclipse
+

@@ -1,0 +1,44 @@
+#服务端口
+server:
+  port: 8089
+#服务名
+spring:
+  http:
+    encoding:
+      enabled: true
+      charset: utf-8
+      force: true
+  main:
+    allow-bean-definition-overriding: true
+  #shardingsphere相关配置
+  shardingsphere:
+    datasource:
+      names: m1   #配置库的名字，随意
+      m1:   #配置目前m1库的数据源信息
+        type: com.alibaba.druid.pool.DruidDataSource
+        driverClassName: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://192.168.1.73:3306/boot-table?serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true&allowMultiQueries=true
+        username: root
+        password: digipower
+    sharding:
+      tables:
+        t_order:  # 指定t_order表的数据分布情况，配置数据节点
+          actualDataNodes: m1.t_order_$->{1..2}
+          tableStrategy:
+            inline:   # 指定t_order表的分片策略，分片策略包括分片键和分片算法
+              shardingColumn: order_id
+              algorithmExpression: t_order_$->{order_id % 2 + 1}
+          keyGenerator:   # 指定t_order表的主键生成策略为SNOWFLAKE
+            type: SNOWFLAKE  #主键生成策略为SNOWFLAKE
+            column: order_id  #指定主键
+    props:
+      sql:
+        show: true
+ 
+#日志打印
+logging:
+  level:
+    root: info
+    org.springframework.web: info
+    com.lucifer.sharding.dao: debug
+    druid.sql: debug

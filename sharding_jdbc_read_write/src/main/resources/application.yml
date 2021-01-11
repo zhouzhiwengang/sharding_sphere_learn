@@ -1,0 +1,46 @@
+############################一主一从，读写分离#################################
+#服务端口
+server:
+  port: 8098
+#服务名
+spring:
+  http:
+    encoding:
+      enabled: true
+      charset: utf-8
+      force: true
+  main:
+    allow-bean-definition-overriding: true
+  #shardingsphere相关配置
+  shardingsphere:
+    datasource:
+      names: m1,s1   #配置库的名字，随意
+      m1:   #配置目前m1库的数据源信息
+        type: com.alibaba.druid.pool.DruidDataSource
+        driverClassName: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://192.168.60.165:3306/user_db?serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true&allowMultiQueries=true
+        username: admini
+        password: 123456
+      s1:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driverClassName: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://192.168.60.206:3306/user_db?serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true&allowMultiQueries=true
+        username: admini
+        password: 123456
+    masterslave:  # 主库从库逻辑数据源定义
+      name: ms
+      master-data-source-name: m1
+      slave-data-source-names: s1
+      load-balance-algorithm-type: round_robin
+    props:
+      sql:
+        show: true   #打印sql
+ 
+ 
+#日志打印
+logging:
+  level:
+    root: info
+    org.springframework.web: info
+    com.lucifer.sharding.dao: debug
+    druid.sql: debug
